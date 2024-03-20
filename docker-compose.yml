@@ -1,0 +1,89 @@
+version: '3'
+include:
+  - server/server-docker-compose.yml
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    networks:
+      - losty_network
+    volumes:
+      - /app/node_modules
+      - ./server:/app
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    networks:
+       - losty_network
+
+  # nginx:
+  #   image: nginx:latest
+  #   ports:
+  #     - 80:8080
+  #   volumes:
+  #     - ./nginx/nginx-setup.conf:/etc/nginx/conf.d/default.conf:ro
+  #     - react_build:/var/www/react
+  #   depends_on:
+  #     - backend
+  #     - frontend
+  #   networks:
+  #     - losty_network
+
+volumes:
+  react_build:
+
+networks:
+  losty_network:
+    external: true
+
+#include:
+  #- server/server-docker-compose.yml
+# services:
+  
+
+#   api:
+#     container_name: api
+#     build:
+#       context: ./server
+#       dockerfile: Dockerfile
+#     networks:
+#       - backend
+    
+
+#   client:
+#     container_name: client
+#     build:
+#       context: ./client
+#       dockerfile: Dockerfile
+#     networks:
+#       - backend
+#     depends_on:
+#       - api
+#     volumes:
+#       - react_build:/usr/src/client/build
+
+#   nginx:
+#     image: nginx:latest
+#     restart: always
+#     ports:
+#       - "80:8080"
+#     volumes:
+#       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+#       - react_build:/var/www/client
+#     networks:
+#       - backend
+#     depends_on:
+#       - client
+#       - api
+
+# volumes:
+#   react_build:
+# networks:
+#   backend:

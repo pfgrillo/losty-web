@@ -1,0 +1,148 @@
+version: '3'
+services:
+  report:
+    build:
+      context: .
+      dockerfile: ./apps/report/Dockerfile
+      target: development
+    command: npm run start:dev report
+    env_file:
+      - ./apps/report/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
+      - auth
+      - users
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3020:3020'
+    networks:
+      - losty_network
+
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3050:3050'
+    networks:
+      - losty_network
+
+ 
+  messages:
+    build:
+      context: .
+      dockerfile: ./apps/messages/Dockerfile
+      target: development
+    command: npm run start:dev messages
+    env_file:
+      - ./apps/messages/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
+      - auth
+      - users
+      - report
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3030:3030'
+
+    networks:
+      - losty_network
+
+  users:
+    build:
+      context: .
+      dockerfile: ./apps/users/Dockerfile
+      target: development
+    command: npm run start:dev users
+    env_file:
+      - ./apps/users/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
+      - auth
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '3010:3010'
+    networks:
+      - losty_network
+
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - '5672:5672'
+    networks:
+      - losty_network
+
+  mongodb-primary:
+    image: docker.io/bitnami/mongodb:7.0
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    volumes:
+      - 'mongodb_master_data:/bitnami/mongodb'
+    ports:
+      - '27017:27017'
+    networks:
+      - losty_network
+
+  mongodb-secondary:
+    image: docker.io/bitnami/mongodb:7.0
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-secondary
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    networks:
+      - losty_network
+
+  mongodb-arbiter:
+    image: docker.io/bitnami/mongodb:7.0
+    depends_on:
+      - mongodb-primary
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
+      - MONGODB_REPLICA_SET_MODE=arbiter
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-primary
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=password123
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    networks:
+      - losty_network
+
+volumes:
+  mongodb_master_data:
+    driver: local
+
+networks:
+  losty_network:
+    external: true
