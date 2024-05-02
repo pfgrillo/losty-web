@@ -7,12 +7,14 @@ import ReportItem from "./features/explore/components/ReportItem";
 import ProfilePage from "./pages/Profile";
 import MessagesPage from "./pages/Messages";
 import ChatPage from "./pages/Chat";
+import SignIn from "./pages/SignIn";
 
 const App = () => {
   return (
     <RootLayout>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/sign_in" element={<SignIn />} />
         <Route path="/" element={
           <ProtectedRoute>
             <Explore />

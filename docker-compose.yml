@@ -22,6 +22,8 @@ services:
       - 80:80
     networks:
        - losty_network
+    depends_on:
+      - backend
 
   # nginx:
   #   image: nginx:latest

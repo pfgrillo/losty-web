@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 // import { CurrentUser } from './current-user.decorator';
 // import JwtAuthGuard from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { IAuth } from './interfaces/user.interface';
 // import { User } from './users/schemas/user.schema';
 
 @Controller('auth')
@@ -20,6 +21,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: any) {
     return this.authService.login(body);
+  }
+
+  @Post('register')
+  async register(@Body() body: IAuth) {
+    return this.authService.register(body);
   }
 
   //@UseGuards(JwtAuthGuard)

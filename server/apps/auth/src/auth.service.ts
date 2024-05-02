@@ -24,6 +24,18 @@ export class AuthService {
     private readonly userModel: Model<IUser>,
   ) {}
 
+  async register(credentials: IAuth) {
+    const hashedPassword = await bcrypt.hash(credentials.password, 10);
+
+    const newUser = new this.userModel({
+      username: credentials.username,
+      password: hashedPassword,
+      confirmPassword: credentials.confirmPassword,
+    });
+
+    return newUser.save();
+  }
+
   async login(credentials: IAuth) {
     const user: IUser = await this.findByUsername(credentials.username);
 

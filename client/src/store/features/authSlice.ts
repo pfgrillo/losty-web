@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { User } from "../../models/User";
-import { loginChunk } from "../../features/authentication/services/auth.service";
+import { loginChunk, registerChunk } from "../../features/authentication/services/auth.service";
 import { RootState } from "..";
 
 export interface AuthState {
@@ -39,6 +39,17 @@ export const authSlice = createSlice({
             state.error = null;
         })
         .addCase(loginChunk.rejected, (state, action) => {
+            state.user = null;
+            state.authorized = false;
+            state.error = action.error.message as string;
+        })
+        .addCase(registerChunk.pending, (state) => { })
+        .addCase(registerChunk.fulfilled, (state, action: PayloadAction<User>) => {
+            state.user = action.payload;
+            state.authorized = true;
+            state.error = null;
+        })
+        .addCase(registerChunk.rejected, (state, action) => {
             state.user = null;
             state.authorized = false;
             state.error = action.error.message as string;

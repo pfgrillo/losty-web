@@ -13,7 +13,7 @@ const Login = () => {
         <LoginForm />
         <div className="text-center p-5">
           Don't have an account?{" "}
-          <a href="/signup" className="text-indigo-600 hover:text-indigo-500">
+          <a href="/sign_in" className="text-indigo-600 hover:text-indigo-500">
             Register now
           </a>
           </div>

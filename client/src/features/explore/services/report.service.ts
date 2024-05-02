@@ -1,34 +1,41 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../../services/createAxiosClient';
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../../services/createAxiosClient";
 
-export const fetchMarkers = createAsyncThunk('markers/fetchMarkers', async () => {
+export const fetchMarkers = createAsyncThunk(
+  "markers/fetchMarkers",
+  async () => {
     try {
-        //const response = await api.get('https://losty-report-api.vercel.app/items');
-        const response = await api.get('http://localhost:3020/items');
+      const response = await api.get("http://localhost:3020/items");
 
-        return response.data;
+      return response.data;
     } catch (error) {
-        throw error;
+      throw error;
     }
-});
+  }
+);
 
-export const postMarker = createAsyncThunk('markers/postMarker', async (marker: any) => {
+export const postMarker = createAsyncThunk(
+  "markers/postMarker",
+  async (marker: any) => {
     try {
-        //const response = await api.post('https://losty-report-api.vercel.app/items', marker);
-        const response = await api.post('http://localhost:3020/items', marker);
+      const response = await api.post("http://localhost:3020/items", marker);
 
-        return response.data;
+      return response.data;
     } catch (error) {
-        throw error;
+      throw error;
     }
-});
+  }
+);
 
-export const deleteMarker = createAsyncThunk('markers/deleteMarker', async (id: string) => {
+export const deleteMarker = createAsyncThunk(
+  "markers/deleteMarker",
+  async (id: string) => {
     try {
-        const response = await api.delete(`http://localhost:3020/items/${id}`);
+      const response = await api.delete(`http://localhost:3020/items/${id}`);
 
-        return response.data;
+      return response.data;
     } catch (error) {
-        throw error;
+      throw error;
     }
-});
+  }
+);
