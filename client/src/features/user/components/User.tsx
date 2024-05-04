@@ -23,7 +23,7 @@ const CardBoxUser = ({ className }: Props) => {
     <>
       <CardBox className={className}>
         <div className="flex flex-col lg:flex-row lg:items-center lggit:justify-around sm:flex-row sm:items-center sm:justify-around">
-          <div className={`flex justify-center items-center ${avatarColor} text-white text-2xl h-[100px] w-[100px] rounded-full`}
+          <div className={`flex justify-center items-center ${avatarColor} text-white text-5xl h-[100px] w-[100px] rounded-full`}
             onClick={() => openModal()}>
             {user.name?.substring(0, 1).toUpperCase()}
           </div>
@@ -49,7 +49,7 @@ const CardBoxUser = ({ className }: Props) => {
             ))}
           </div>
           <div className="flex flex-row justify-around m-3">
-            <Button className="p-2" label="Delete" color="main" />
+            <Button className="p-2" label="Accept" color="main" />
             <Button className="p-2" label="Cancel" color="transparent" onClick={() => setShowModal((prev) => !prev)} />
           </div>
         </CardBox>

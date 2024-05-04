@@ -114,6 +114,6 @@ export const selectError = (state: RootState) => state.messages.error;
 //export const selectMessages = (state: RootState) => state.messages.messages;
 //export const selectCreator = (state: RootState) => state.messages.host;
 //export const selectGuest = (state: RootState) => state.messages.guest;
-export const selectChatRoom = (state: RootState) => state.messages.chatRooms;
+export const selectChatRooms = (state: RootState) => state.messages.chatRooms;
 
 export default messagesSlice.reducer;

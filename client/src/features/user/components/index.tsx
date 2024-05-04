@@ -1,7 +1,6 @@
 
 
 import { ReactNode } from 'react'
-import userAvatar from '../../../assets/user-avatar.svg'
 
 type Props = {
   username: string

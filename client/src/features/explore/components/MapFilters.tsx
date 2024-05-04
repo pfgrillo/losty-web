@@ -32,7 +32,7 @@ const MapFilters = ({ onFilterChange }: Props) => {
     register,
     watch,
     handleSubmit,
-    formState: { errors },
+    //formState: { errors },
   } = useForm<FieldValues>();
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     const filterOptions: FilterOptions = {

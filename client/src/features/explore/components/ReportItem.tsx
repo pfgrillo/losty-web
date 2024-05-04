@@ -15,7 +15,8 @@ import SelectField from "../../../common/components/Form/SelectField";
 
 const ReportItem = () => {
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-  const { register, handleSubmit, formState: { errors } } = useForm<FieldValues>();
+  // const { register, handleSubmit, formState: { errors } } = useForm<FieldValues>();
+  const { register, handleSubmit } = useForm<FieldValues>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const reportState = useSelector(selectReportState);

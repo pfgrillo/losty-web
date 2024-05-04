@@ -33,9 +33,9 @@ const CloseMarkers = ({ closeMarkers, user, onCloseMarkersChange }: Props) => {
   );
 
   const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(false);
-  const [infoWindowPosition, setInfoWindowPosition] = useState<Marker | null>(
+  /* const [infoWindowPosition, setInfoWindowPosition] = useState<Marker | null>(
     null
-  );
+  ); */
   const IconComponent = ({
     icon,
     color = "#6366F1",
@@ -51,7 +51,7 @@ const CloseMarkers = ({ closeMarkers, user, onCloseMarkersChange }: Props) => {
   }, [closeMarkers, onCloseMarkersChange]);
 
   const handleMouseEnter = (marker: Marker) => {
-    setInfoWindowPosition(marker);
+    // setInfoWindowPosition(marker);
     setIsInfoWindowOpen(!isInfoWindowOpen);
   };
 

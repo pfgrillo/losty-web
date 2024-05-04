@@ -15,7 +15,7 @@ const ItemCard = ({ marker }: Props) => {
     }
 
     return (
-        <div className="text-white">
+        <div className="flex flex-col text-white">
             <div className="rounded-t-lg opacity-10 bg-white w-full h-24
             ">Image</div>
             <div className="h-24">Description</div>

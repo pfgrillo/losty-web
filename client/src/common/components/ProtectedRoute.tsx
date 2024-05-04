@@ -6,7 +6,7 @@ import NavBar from "./NavBar";
 import NavBarItemPlain from "./NavBar/Item/Plain";
 import { MenuAsideItem, MenuNavBarItem } from "../../models/MenuItems";
 import { RiMenuFoldLine, RiMenuUnfoldLine, RiMenuLine } from "react-icons/ri";
-import { MdOutlineAccountCircle, MdOutlineLogout, MdOutlineTravelExplore, MdOutlineEvent } from 'react-icons/md';
+import { MdOutlineAccountCircle, MdOutlineLogout, MdOutlineTravelExplore } from 'react-icons/md';
 import { HiOutlineMail } from 'react-icons/hi';
 import Sidebar from "./Sidebar";
 import { fetchUser } from "../../features/user/services/user.service";
@@ -22,8 +22,8 @@ const menuAside: MenuAsideItem[] = [
   },
   {
     href: '/Messages',
-    icon: MdOutlineEvent,
-    label: 'messages',
+    icon: HiOutlineMail,
+    label: 'Messages',
   },
 ];
 
