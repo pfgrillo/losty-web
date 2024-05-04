@@ -6,7 +6,6 @@ import Explore from "./pages/Explore";
 import ReportItem from "./features/explore/components/ReportItem";
 import ProfilePage from "./pages/Profile";
 import MessagesPage from "./pages/Messages";
-import ChatPage from "./pages/Chat";
 import SignIn from "./pages/SignIn";
 
 const App = () => {
@@ -34,10 +33,6 @@ const App = () => {
           <Route path="/messages" element={
           <ProtectedRoute>
             <MessagesPage />
-          </ProtectedRoute>} />
-          <Route path="/chat/:item" element={
-          <ProtectedRoute>
-            <ChatPage/>
           </ProtectedRoute>} />
       </Routes>
     </RootLayout>
