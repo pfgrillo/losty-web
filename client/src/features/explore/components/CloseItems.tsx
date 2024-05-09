@@ -4,7 +4,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store";
 import { motion } from "framer-motion";
-import { Marker } from "../../../models/Marker";
+import { ReportedItem } from "../../../models/ReportedItem";
 import CardBox from "../../../common/components/Cards";
 import Buttons from "../../../common/components/Buttons";
 import Button from "../../../common/components/Button";
@@ -13,29 +13,55 @@ import { MdMyLocation } from "react-icons/md";
 import { openRoom } from "../../messages/messages.service";
 import { useNavigate } from "react-router-dom";
 import { UserState } from "../../../store/features/userSlice";
+import useCloseMarkers from "../../../hooks/closeMarkersHook";
+import { useAppSelector } from "../../../hooks/storeHook";
+import {
+  selectCloseItems,
+  selectReportedItems,
+} from "../../../store/features/reportSlice";
 
 interface Props {
-  closeMarkers: Marker[];
   user: UserState;
-  onCloseMarkersChange: (closeMarkers: Marker[]) => void;
+  cardsPerPage?: number;
 }
 
-const CloseMarkers = ({ closeMarkers, user, onCloseMarkersChange }: Props) => {
+const CloseItems = ({ user, cardsPerPage = 4 }: Props) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const reportedItems = useAppSelector(selectReportedItems);
+  const closeMarkers = useCloseMarkers(reportedItems, 3);
+  const closerMarkers = useAppSelector(selectCloseItems);
 
   const [page, setPage] = useState(0);
-  const cardsPerPage = 4;
-  const maxPage = Math.ceil(closeMarkers.length / cardsPerPage);
-  const paginatedCloseMarkers = closeMarkers.slice(
-    page * cardsPerPage,
-    (page + 1) * cardsPerPage
-  );
+  const [maxPage, setMaxPage] = useState(0);
+  const [paginatedCloseMarkers, setPaginatedCloseMarkers] = useState<
+    ReportedItem[]
+  >([]);
+
+  useEffect(() => {
+    setMaxPage(
+      Math.ceil(
+        closerMarkers.length === 0
+          ? closeMarkers.length / cardsPerPage
+          : closerMarkers.length / cardsPerPage
+      )
+    );
+    setPaginatedCloseMarkers(
+      closerMarkers.length === 0
+        ? closeMarkers.slice(page * cardsPerPage, (page + 1) * cardsPerPage)
+        : closerMarkers.slice(page * cardsPerPage, (page + 1) * cardsPerPage)
+    );
+  }, [closeMarkers, page, cardsPerPage, closerMarkers]);
 
   const [isInfoWindowOpen, setIsInfoWindowOpen] = useState(false);
-  /* const [infoWindowPosition, setInfoWindowPosition] = useState<Marker | null>(
+  /* const [infoWindowPosition, setInfoWindowPosition] = useState<ReportedItem | null>(
     null
   ); */
+
+  useEffect(() => {
+    console.log("closerMarkers", closerMarkers);
+  }, [closerMarkers]);
+
   const IconComponent = ({
     icon,
     color = "#6366F1",
@@ -46,11 +72,11 @@ const CloseMarkers = ({ closeMarkers, user, onCloseMarkersChange }: Props) => {
     return icon({ size: 24, className: "", color });
   };
 
-  useEffect(() => {
+  /*  useEffect(() => {
     onCloseMarkersChange(closeMarkers);
   }, [closeMarkers, onCloseMarkersChange]);
-
-  const handleMouseEnter = (marker: Marker) => {
+ */
+  const handleMouseEnter = (marker: ReportedItem) => {
     // setInfoWindowPosition(marker);
     setIsInfoWindowOpen(!isInfoWindowOpen);
   };
@@ -63,7 +89,7 @@ const CloseMarkers = ({ closeMarkers, user, onCloseMarkersChange }: Props) => {
     setPage((prevPage) => (prevPage - 1 + maxPage) % maxPage);
   };
 
-  const handleCardButtonClick = (item: Marker) => {
+  const handleCardButtonClick = (item: ReportedItem) => {
     dispatch(
       openRoom({
         host: user.username!,
@@ -76,15 +102,16 @@ const CloseMarkers = ({ closeMarkers, user, onCloseMarkersChange }: Props) => {
 
   return (
     <div className="flex flex-col justify-center items-center lg:justify-start lg:items-center pr-2 mb-2">
-      <div className="lg:overflow-y-auto lg:h-[650px] pr-2">
+      {/*       <div className="lg:overflow-y-auto lg:h-[650px] pr-2">*/}
+      <div className="lg:overflow-y-auto pr-2">
         <motion.div
-          className="flex overflow-visible overflow-x-auto sm:flex-wrap lg:flex-wrap justify-start items-start rounded-md w-[500px] pb-10"
+          className="flex overflow-visible overflow-x-auto sm:flex-wrap lg:flex-wrap justify-start items-start rounded-md w-[500px] pb-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
         >
-          {paginatedCloseMarkers.map((marker: Marker) => {
+          {paginatedCloseMarkers.map((marker: ReportedItem) => {
             return (
               <motion.div
                 className="flex w-[250px] h-[320px] px-2 pb-4"
@@ -177,4 +204,4 @@ const CloseMarkers = ({ closeMarkers, user, onCloseMarkersChange }: Props) => {
   );
 };
 
-export default CloseMarkers;
+export default CloseItems;

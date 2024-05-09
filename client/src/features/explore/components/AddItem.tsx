@@ -1,5 +1,5 @@
 import React from "react";
-import { ReportType } from "../../../models/Marker";
+import { ReportType } from "../../../models/ReportedItem";
 import { ReactComponent as AddLostIcon } from "../../../assets/icons/add_lost.svg";
 import { ReactComponent as AddFoundIcon } from "../../../assets/icons/add_found.svg";
 

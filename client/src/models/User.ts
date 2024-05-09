@@ -1,6 +1,6 @@
-import { Marker } from "./Marker";
+import { ReportedItem } from "./ReportedItem";
 
 export interface User {
   username: string;
-  items?: Marker[];
+  items?: ReportedItem[];
 }

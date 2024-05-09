@@ -1,4 +1,4 @@
-import { ReportType, ItemType } from "../../../models/Marker";
+import { ReportType, ItemType } from "../../../models/ReportedItem";
 import { SubmitHandler, useForm, FieldValues } from "react-hook-form";
 import Button from "../../../common/components/Button";
 import FormField from "../../../common/components/Form/FormField";
@@ -53,7 +53,10 @@ const MapFilters = ({ onFilterChange }: Props) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full flex flex-col bg-white p-3">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full flex flex-col bg-white p-3"
+    >
       <div className="flex flex-row gap-x-10 flex-1 flex-wrap justify-start mb-4">
         <FormField label="Report Type" id="reportType">
           <FormCheckRadioGroup>

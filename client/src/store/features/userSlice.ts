@@ -4,14 +4,14 @@ import {
   UserResponse,
   fetchUser,
 } from "../../features/user/services/user.service";
-import { Marker } from "../../models/Marker";
+import { ReportedItem } from "../../models/ReportedItem";
 import { RootState } from "..";
 
 export interface UserState {
   id: string | null;
   username: string | null;
   name: string | null;
-  items: Marker[];
+  items: ReportedItem[];
   chats: { chatRoom: string; users: string[]; item: string }[];
   error: string | null;
 }

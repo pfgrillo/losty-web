@@ -2,24 +2,27 @@ import SectionMain from "../common/components/Section/SectionMain";
 import { useSelector } from "react-redux";
 import { selectUserChats } from "../store/features/userSlice";
 import CardBox from "../common/components/Cards";
-import { selectMarkers } from "../store/features/reportSlice";
-import { Marker, ReportType } from "../models/Marker";
+import { selectReportedItems } from "../store/features/reportSlice";
+import { ReportedItem, ReportType } from "../models/ReportedItem";
 import { colorsBgLight } from "../colors";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { getMessages } from "../features/messages/messages.service";
 import { selectChatRooms } from "../store/features/messageSlice";
 import { useAppDispatch } from "../hooks/storeHook";
-import ChatContainer from "../features/messages/components/ChatContainer";
+// import ChatContainer from "../features/messages/components/ChatContainer";
 import ItemCard from "../common/components/ItemCard";
 import Button from "../common/components/Button";
+
+const ChatContainer = lazy(() => import('../features/messages/components/ChatContainer'));
+
 
 const MessagesPage = () => {
   const dispatch = useAppDispatch();
   const userChats = useSelector(selectUserChats);
-  const markers: Marker[] = useSelector(selectMarkers);
+  const markers: ReportedItem[] = useSelector(selectReportedItems);
   const messagesStore = useSelector(selectChatRooms);
   const [chatRoom, setChatRoom] = useState<string>("");
-  const [marker, setMarker] = useState<Marker | undefined>();
+  const [marker, setMarker] = useState<ReportedItem | undefined>();
 
   // Get all messages for each chat room
   useEffect(() => {
@@ -58,28 +61,28 @@ const MessagesPage = () => {
                 onClick={() => handleClick(chat)}
               >
                 <div className="flex flex-row">
-                    <div className="flex flex-col items-end rounded shadow-m pr-8">
-                      <div>
-                        {
-                          markers.find((marker) => marker._id === chat.item)
-                            ?.title
-                        }
-                      </div>
-                      <div
-                        className={`text-sm w-fit self-end px-1 border rounded-md 
+                  <div className="flex flex-col items-end rounded shadow-m pr-8">
+                    <div>
+                      {
+                        markers.find((marker) => marker._id === chat.item)
+                          ?.title
+                      }
+                    </div>
+                    <div
+                      className={`text-sm w-fit self-end px-1 border rounded-md 
                         ${
                           markers.find((marker) => marker._id === chat.item)
                             ?.reportType === ReportType.FOUND
                             ? colorsBgLight.success
                             : colorsBgLight.danger
                         }`}
-                      >
-                        {
-                          markers.find((marker) => marker._id === chat.item)
-                            ?.itemType
-                        }
-                      </div>
+                    >
+                      {
+                        markers.find((marker) => marker._id === chat.item)
+                          ?.itemType
+                      }
                     </div>
+                  </div>
 
                   <div className="">New conversation with {chat.users[0]}</div>
                 </div>

@@ -10,7 +10,7 @@ import { selectUser } from "../../../store/features/userSlice";
 import { VscSend } from "react-icons/vsc";
 import { useEffect, useRef, useState } from "react";
 import { Socket, io } from "socket.io-client";
-import { selectMarkers } from "../../../store/features/reportSlice";
+import { selectReportedItems } from "../../../store/features/reportSlice";
 import { RootState } from "../../../store";
 
 interface Message {
@@ -39,7 +39,7 @@ const ChatContainer = ({ guestId, chatRoom }: Props) => {
   const messagesStore = useSelector(
     (state: RootState) => state.messages.chatRooms[chatRoom]
   );
-  const markers = useSelector(selectMarkers);
+  const markers = useSelector(selectReportedItems);
 
   useEffect(() => {
     dispatch(getMessages({ chatRoom }));

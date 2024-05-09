@@ -1,4 +1,4 @@
-export interface Marker {
+export interface ReportedItem {
     user: string;
     _id?: string;
     label: string;
@@ -6,7 +6,7 @@ export interface Marker {
     itemType: ItemType;
     reportTime: string;
     reportDate: string;
-    coordinates: Coordinates;
+    coordinates: ItemCoordinates;
     place?: string;
     description: string;
     title: string;
@@ -51,7 +51,7 @@ export enum ItemType {
     BICYCLE = "Bicycle",
 }
 
-export interface Coordinates {
+export interface ItemCoordinates {
     lat: number;
     lng: number;
 }

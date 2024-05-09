@@ -1,9 +1,9 @@
 import RewardCard from "../features/dashboard/components/RewardCards";
-import { ItemType, Marker, ReportType } from "../models/Marker";
+import { ItemType, ReportedItem, ReportType } from "../models/ReportedItem";
 import SectionMain from "../common/components/Section/SectionMain";
 
 const Dashboard = () => {
-  const rewardedMarkers: Marker[] = [
+  const rewardedMarkers: ReportedItem[] = [
     {
       _id: "1",
       title: "Test",

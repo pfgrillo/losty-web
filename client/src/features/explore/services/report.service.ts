@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../services/createAxiosClient";
 
-export const fetchMarkers = createAsyncThunk(
+export const fetchReportedItems = createAsyncThunk(
   "markers/fetchMarkers",
   async () => {
     try {
@@ -14,11 +14,11 @@ export const fetchMarkers = createAsyncThunk(
   }
 );
 
-export const postMarker = createAsyncThunk(
+export const postReportedItem = createAsyncThunk(
   "markers/postMarker",
-  async (marker: any) => {
+  async (item: any) => {
     try {
-      const response = await api.post("http://localhost:3020/items", marker);
+      const response = await api.post("http://localhost:3020/items", item);
 
       return response.data;
     } catch (error) {
@@ -27,7 +27,7 @@ export const postMarker = createAsyncThunk(
   }
 );
 
-export const deleteMarker = createAsyncThunk(
+export const deleteReportedItem = createAsyncThunk(
   "markers/deleteMarker",
   async (id: string) => {
     try {

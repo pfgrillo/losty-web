@@ -1,12 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../../services/createAxiosClient";
-import { Marker } from "../../../models/Marker";
+import { ReportedItem } from "../../../models/ReportedItem";
 
 export interface UserResponse {
   _id: string;
   username: string;
   name: string;
-  items: Marker[];
+  items: ReportedItem[];
   chats: any[];
 }
 

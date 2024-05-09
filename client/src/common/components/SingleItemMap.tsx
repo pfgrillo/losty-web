@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
-import { Marker, ReportType } from '../../models/Marker';
-import mapStyles from '../../features/explore/mapStyles.json';
+import { useEffect, useRef } from "react";
+import { ReportedItem, ReportType } from "../../models/ReportedItem";
+import mapStyles from "../../features/explore/mapStyles.json";
 
 export interface Props {
-  marker: Marker;
+  marker: ReportedItem;
 }
 
 const SingleItemMap = ({ marker }: Props) => {
@@ -27,22 +27,18 @@ const SingleItemMap = ({ marker }: Props) => {
         position,
         map,
         icon: {
-          url: marker.reportType === ReportType.FOUND
-            ? (require('../../assets/icons/found.svg')).default
-            : (require('../../assets/icons/lost.svg')).default,
+          url:
+            marker.reportType === ReportType.FOUND
+              ? require("../../assets/icons/found.svg").default
+              : require("../../assets/icons/lost.svg").default,
           anchor: new google.maps.Point(17, 46),
           scaledSize: new google.maps.Size(32, 32),
-        }
+        },
       });
     }
   }, [ref, marker.coordinates.lat, marker.coordinates.lng, marker.reportType]);
 
-  return (
-    <div
-      ref={ref}
-      className="rounded-md w-full h-full"
-    />
-  );
+  return <div ref={ref} className="rounded-md w-full h-full" />;
 };
 
 export default SingleItemMap;

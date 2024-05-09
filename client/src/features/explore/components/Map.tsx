@@ -1,38 +1,47 @@
-import { useEffect, useRef, useState } from "react";
-import { Coordinates, Marker, ReportType } from "../../../models/Marker";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ReportedItem,
+  ItemCoordinates,
+  ReportType,
+} from "../../../models/ReportedItem";
 import {
   MarkerClusterer,
   SuperClusterAlgorithm,
   Cluster,
 } from "@googlemaps/markerclusterer";
-import mapStyles from "../mapStyles.json";
 import ReactDOMServer from "react-dom/server";
 import InfoWindow from "./Infowindow";
-import { useDispatch } from "react-redux";
 import Button from "../../../common/components/Button";
 import { createRoot } from "react-dom/client";
 import Modal from "../../../common/components/Modal";
 import Buttons from "../../../common/components/Buttons";
 import { useNavigate } from "react-router-dom";
-import AddMarker from "./AddMarker";
+import AddMarker from "./AddItem";
+import { LuFilter } from "react-icons/lu";
+import { setCloseItems } from "../../../store/features/reportSlice";
+import { useAppDispatch } from "../../../hooks/storeHook";
+import foundIcon from "../../../assets/icons/found.svg";
+import lostIcon from "../../../assets/icons/lost.svg";
 
 interface Props {
-  markers: Marker[];
-  onPositionChange?: (closeMarkers: Marker[]) => void;
-  onItemCardHover?: Marker;
+  markers: ReportedItem[];
+  onItemCardHover?: ReportedItem;
   isInfoWindowOpen?: boolean;
-  infoWindowPosition?: Marker;
+  infoWindowPosition?: ReportedItem;
+  onFilterToggle?: (value: boolean) => void;
 }
+
+const mapId = process.env.REACT_APP_GOOGLE_MAPS_ID;
 
 const GoogleMap = ({
   markers,
-  onPositionChange,
   onItemCardHover,
   isInfoWindowOpen,
   infoWindowPosition,
+  onFilterToggle,
 }: Props) => {
   const ref = useRef<HTMLDivElement | null>(null);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -47,12 +56,21 @@ const GoogleMap = ({
 
   // Get users current location
   useEffect(() => {
-    navigator?.geolocation.getCurrentPosition(
-      ({ coords: { latitude: lat, longitude: lng } }) => {
-        const pos = { lat, lng };
-        setCurrentLocation(pos);
-      }
-    );
+    const fetchUserLocation = () => {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords: { latitude: lat, longitude: lng } }) => {
+          const pos = { lat, lng };
+          setCurrentLocation(pos);
+        }
+      );
+    };
+
+    // Check if the user has already granted permission to access their location
+    if ("geolocation" in navigator) {
+      fetchUserLocation();
+    } else {
+      console.log("Geolocation is not supported by this browser.");
+    }
   }, []);
 
   // Open or close info window based on props changes
@@ -113,16 +131,57 @@ const GoogleMap = ({
     </Buttons>
   );
 
+  // Handler for toggling the filter options
+  /*   const handleFilterToggle = (event: React.MouseEvent<Element, MouseEvent>) => {
+    event.preventDefault();
+    event.stopPropagation(); // Stop event propagation to prevent map reload
+    if (onFilterToggle) {
+      onFilterToggle(true); // Emit true to open the filter options
+    }
+  }; */
+
+  const handleFilterToggle = useCallback(
+    (event: React.MouseEvent<Element, MouseEvent>) => {
+      event.preventDefault();
+      event.stopPropagation(); // Stop event propagation to prevent map reload
+      if (onFilterToggle) {
+        onFilterToggle(true); // Emit true to open the filter options
+      }
+    },
+    [onFilterToggle]
+  );
+  // Function to create a custom control element and render a React component inside it
+  const createMapHTMLElement = (
+    map: google.maps.Map,
+    position: google.maps.ControlPosition,
+    component: JSX.Element
+  ) => {
+    // Create the custom control element
+    const customControlElement = document.createElement("div");
+
+    // Create a root container for the custom control element
+    const rootContainer = createRoot(customControlElement);
+
+    // Render the React component inside the custom control element
+    rootContainer.render(component);
+
+    // Push the custom control element to the specified position on the map
+    map.controls[position].push(customControlElement);
+  };
+
   // Create the Google Map and handle related functionalities when component mounts
   useEffect(() => {
     if (ref.current) {
-      const map = new window.google.maps.Map(ref.current, {
-        styles: mapStyles,
+      const mapOptions = {
+        //styles: mapStyles,
         center: currentLocation,
         zoom: 16,
         disableDefaultUI: true,
         zoomControl: true,
-      });
+        mapId,
+      };
+
+      const map = new window.google.maps.Map(ref.current, mapOptions);
 
       if (map) {
         setMap(map);
@@ -130,25 +189,20 @@ const GoogleMap = ({
 
       // Function to handle the report item button and its behavior
       const renderReportItemButton = (map: google.maps.Map): void => {
-        const customControlElement = document.createElement("div");
-        const rootContainer = createRoot(customControlElement);
-
-        let customControl;
-
-        if (reportType == null) {
-          customControl = (
+        createMapHTMLElement(
+          map,
+          window.google.maps.ControlPosition.BOTTOM_CENTER,
+          reportType == null ? (
             <Button
               className="mb-10 text-base"
               label="Report item"
               color="main"
               onClick={() => {
-                onPositionChange!([]);
+                // onPositionChange!([]);  maybe this needs to be changed to useAppDispatch(setCloseItems([]))
                 setShowModal((prev) => !prev);
               }}
             />
-          );
-        } else {
-          customControl = (
+          ) : (
             <Buttons className="mb-10 justify-around">
               <Button
                 className="text-base"
@@ -164,21 +218,33 @@ const GoogleMap = ({
                 onClick={() => cancelReportItem()}
               />
             </Buttons>
-          );
-        }
+          )
+        );
 
-        // Render the custom control button on the bottom center of the map
-        rootContainer.render(customControl);
-        map.controls[window.google.maps.ControlPosition.BOTTOM_CENTER].push(
-          customControlElement
+        // Create a custom control for the filter button
+        createMapHTMLElement(
+          map,
+          window.google.maps.ControlPosition.TOP_RIGHT,
+          <Button
+            small
+            icon={LuFilter}
+            iconColor="white"
+            color="main"
+            onClick={(e) => handleFilterToggle(e)}
+            className="m-5"
+          />
         );
 
         // Listener to update markers when map is dragged
         map.addListener("dragend", () => {
           if (reportType == null) {
-            const markersDistance: { marker: Marker; distance: number }[] = [];
+            const markersDistance: {
+              marker: ReportedItem;
+              distance: number;
+            }[] = [];
             // Get the new center of the map after dragging
             const newCenter = map.getCenter();
+            console.log(newCenter?.lat());
             // Filter markers based on their distance from the new center
             markers.forEach((marker) => {
               // Check if marker is within a certain radius of the new center
@@ -191,14 +257,16 @@ const GoogleMap = ({
                   newCenter!,
                   markerPosition
                 );
+
               if (distance <= 3000) {
+                console.log(distance);
                 markersDistance.push({ marker, distance });
                 return;
               }
               return;
             });
 
-            const closeMarkers: Marker[] = [
+            const closeMarkers: ReportedItem[] = [
               ...markersDistance
                 .sort((a, b) => a.distance! - b.distance!)
                 .map((marker) => marker.marker),
@@ -210,11 +278,7 @@ const GoogleMap = ({
             if (hasRewards) {
               closeMarkers.sort((a, b) => b.reward! - a.reward!);
             }
-
-            // Update markers based on new center
-            onPositionChange!(closeMarkers);
-
-            return closeMarkers;
+            dispatch(setCloseItems(closeMarkers));
           } else {
             return [];
           }
@@ -239,22 +303,19 @@ const GoogleMap = ({
         const selectedPosition = map.getCenter();
 
         if (reportType && selectedPosition) {
-          const position: Coordinates = {
+          const position: ItemCoordinates = {
             lat: selectedPosition?.lat()!,
             lng: selectedPosition?.lng()!,
           };
+          const img = document.createElement("img");
+          img.src = reportType === ReportType.FOUND ? foundIcon : lostIcon;
+          img.style.width = "32px";
+          img.style.height = "32px";
 
-          new google.maps.Marker({
+          new google.maps.marker.AdvancedMarkerElement({
             position,
             map,
-            icon: {
-              url:
-                reportType === ReportType.FOUND
-                  ? require("../../../assets/icons/found.svg").default
-                  : require("../../../assets/icons/lost.svg").default,
-              anchor: new google.maps.Point(17, 46),
-              scaledSize: new google.maps.Size(32, 32),
-            },
+            content: img,
           });
           navigate(`/explore/report-item`, {
             state: {
@@ -295,7 +356,8 @@ const GoogleMap = ({
     reportType,
     hideMarkers,
     navigate,
-    onPositionChange,
+    onFilterToggle,
+    handleFilterToggle,
   ]);
 
   return (
@@ -330,34 +392,31 @@ const GoogleMap = ({
 
 export default GoogleMap;
 
-const createMarkerClusterer = (
+const createMarkerClusterer = async (
   map: google.maps.Map,
-  markers: Marker[],
+  markers: ReportedItem[],
   type: ReportType,
-  onMarkerClick: (marker: google.maps.Marker) => void
-): MarkerClusterer => {
+  onMarkerClick: (marker: google.maps.marker.AdvancedMarkerElement) => void
+): Promise<MarkerClusterer> => {
+  const { AdvancedMarkerElement } = (await google.maps.importLibrary(
+    "marker"
+  )) as google.maps.MarkerLibrary;
+
   const clusterer = new MarkerClusterer({
     renderer: {
       render: ({ count, position }: Cluster, stats: any) => {
-        const marker = new google.maps.Marker({
-          label: {
-            text: String(count),
-            color: type === ReportType.FOUND ? "#23C16B" : "#FF5247",
-            fontSize: "15px",
-            fontWeight: "bold",
-            fontFamily: "Inter",
-          },
-          icon: {
-            url:
-              type === ReportType.FOUND
-                ? require("../../../assets/icons/cluster_found.svg").default
-                : require("../../../assets/icons/cluster_lost.svg").default,
-            anchor: new google.maps.Point(17, 46),
-            scaledSize: new google.maps.Size(42, 42),
-          },
+        const priceTag = document.createElement("div");
+        priceTag.className = `w-[32px] h-[32px] flex items-center justify-center text-bold text-lg border-2 rounded-full ${
+          type === ReportType.FOUND
+            ? "bg-[#BEFFC780] border-[#6CE1A1] text-[#23C16B]"
+            : "bg-[#FCAFA380] border-[#FF827A] text-[#FF5247]"
+        }`;
+        priceTag.textContent = String(count);
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          content: priceTag,
           position: position,
           map,
-          zIndex: Number(google.maps.Marker.MAX_ZINDEX) + count,
         });
         return marker;
       },
@@ -368,7 +427,7 @@ const createMarkerClusterer = (
     }),
   });
 
-  const markersWithListeners: google.maps.Marker[] = [];
+  const markersWithListeners: google.maps.marker.AdvancedMarkerElement[] = [];
 
   markers
     .filter((marker) => marker.reportType === type)
@@ -378,20 +437,16 @@ const createMarkerClusterer = (
         lng: marker.coordinates.lng,
       };
 
-      const markerOptions: google.maps.MarkerOptions = {
+      const img = document.createElement("img");
+      img.src = type === ReportType.FOUND ? foundIcon : lostIcon;
+      img.style.width = "32px";
+      img.style.height = "32px";
+
+      const googleMarker = new AdvancedMarkerElement({
         position,
         map,
-        icon: {
-          url:
-            marker.reportType === ReportType.FOUND
-              ? require("../../../assets/icons/found.svg").default
-              : require("../../../assets/icons/lost.svg").default,
-          anchor: new google.maps.Point(17, 46),
-          scaledSize: new google.maps.Size(32, 32),
-        },
-      };
-
-      const googleMarker = new google.maps.Marker(markerOptions);
+        content: img,
+      });
 
       const infowindow = new google.maps.InfoWindow();
 
